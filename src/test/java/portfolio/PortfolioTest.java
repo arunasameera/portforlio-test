@@ -40,12 +40,7 @@ public class PortfolioTest {
         assertEquals("S&P 500", etf.indexName());
     }
 
-    @Test
-    void etf_exposesIndexName() {
-        Etf etf = new Etf("SPY", new BigDecimal("30"), 1, "S&P 500");
 
-        assertEquals("S&P 500", etf.indexName());
-    }
 
 
     @Test
@@ -87,6 +82,42 @@ public class PortfolioTest {
         assertEquals(2, top2Stocks.size());
         assertEquals("AAPL", top2Stocks.get(0).symbol()); // 50
         assertEquals("MSFT", top2Stocks.get(1).symbol()); // 45
+
+    }
+
+
+    @Test
+    public void find_withAllCreteriaValues(){
+        Portfolio portfolio = new Portfolio();
+        portfolio.add(new CommonStock("AAPL", new BigDecimal("10"), 5)); // 50
+        portfolio.add(new PreferredStock("GOOGL", new BigDecimal("20"), 2, new BigDecimal("0.05"))); // 40
+        portfolio.add(new CommonStock("MSFT", new BigDecimal("15"), 3)); // 45
+        portfolio.add(new Etf("SPY", new BigDecimal("30"), 1, "S&P 500")); // 30
+
+        var criteria = new portfolio.model.StockCriteria(
+                StockType.COMMON,
+                new BigDecimal("40"),
+                "A"
+        );
+
+        List<Stock> result = portfolio.find(criteria);
+
+        assertEquals(1, result.size());
+        assertEquals("AAPL", result.get(0).symbol());
+
+        CommonStock commonStock = (CommonStock) result.get(0);
+        assertEquals(StockType.COMMON,commonStock.type());
+        assertEquals(0, new BigDecimal("50").compareTo(commonStock.marketValue()));
+        assertEquals("AAPL", commonStock.symbol());
+    }
+
+    @Test
+    public void find_throwsException_whenCriteriaIsNull(){
+        Portfolio portfolio = new Portfolio();
+
+        assertEquals(IllegalArgumentException.class,
+                assertThrows(IllegalArgumentException.class,
+                        () -> portfolio.find(null)).getClass());
 
     }
 

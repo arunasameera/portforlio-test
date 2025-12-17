@@ -67,7 +67,6 @@ public class Portfolio {
     }
 
 
-
     public PortfolioSummary summary() {
         BigDecimal total = totalMarketValue();
 
@@ -80,7 +79,6 @@ public class Portfolio {
 
         return new PortfolioSummary(total, byType, stocks.size());
     }
-
 
 
 }
